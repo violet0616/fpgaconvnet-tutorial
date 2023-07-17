@@ -6,4 +6,4 @@
 	url = https://github.com/AlexMontgomerie/fpgaconvnet-hls.git
 [submodule "samo"]
 	path = samo
-	url = https://github.com/AlexMontgomerie/samo.git
+	url = https://github.com/violet0616/samo.git
