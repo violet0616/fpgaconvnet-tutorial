@@ -23,8 +23,7 @@ print(f"predicted throughput (img/s): {net.get_throughput()} (batch size={net.ba
 print(f"predicted resource usage: {net.partitions[0].get_resource_usage()}")
 #!mkdir -p outputs
 import sys
-sys.path.append('C:\\IC\\2023_project\\2023_project\\FpgaConvnet\\fpgaconvnet-tutorial\\samo\\samo')  # Add the path to the folder containing the cli script
-
+sys.path.append('C:\\IC\\2023_project\\2023_project\\FpgaConvnet_forked\\fpgaconvnet-tutorial\\samo\\samo')  # Add the path to the folder containing the cli script
 from cli import main_for_multi  # Import the main function from the cli script
 from cli import main_for_one
 
