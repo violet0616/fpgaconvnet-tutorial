@@ -45,21 +45,49 @@ def send_array(serial_descriptor, arr):
     arr = arr.astype('int32')
 
     # Serialize to space delimited ascii string
-    arr = arr.flatten('C')
-    arrstr = ""
-
+    arr = arr.flatten('C')  #C按照行来, F按照列
+    arrstr = ""             #初始字符串
+    new_line= "\n"
+    arrstr1 = "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 1 0 0 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 1 0 0 1 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 1 0 0 1 0 0 2 0 0 0 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 1 1 2 3 1 7 16 15 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 13 22 22 22 21 22 22 22 4 1 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 1 6 18 22 21 21 22 22 22 21 17 17 5 0 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 19 22 21 22 21 22 22 22 22 22 21 19 4 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 6 20 22 22 21 10 3 4 9 22 22 21 11 2 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 5 9 10 10 3 0 0 0 17 21 22 22 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 1 1 0 6 21 22 22 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 1 0 0 0 0 3 22 22 22 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 0 0 1 1 9 22 22 21 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 0 1 16 21 22 21 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 4 8 7 0 0 2 21 21 22 18 0 1 0 0 0 0 0 0 0 0 0 1 1 2 9 9 16 16 20 22 22 16 16 20 21 22 18 2 1 0 0 0 0 0 0 0 0 0 3 9 16 21 22 21 22 21 22 22 21 22 22 21 22 22 19 11 1 0 0 0 0 0 0 0 0 0 11 22 20 22 22 21 20 18 21 22 22 22 21 22 22 21 22 21 15 1 0 0 0 0 0 1 0 1 22 22 22 20 17 7 0 5 17 21 22 20 21 12 9 17 22 21 22 16 0 0 0 0 1 0 2 0 21 21 22 22 19 20 19 18 21 22 22 21 7 0 0 2 16 21 21 21 0 0 0 0 0 0 0 0 14 22 22 21 22 21 22 22 22 17 9 5 0 2 0 1 0 5 22 14 0 0 0 0 0 2 0 0 1 3 14 17 15 16 14 4 0 1 1 1 0 0 0 0 0 0 1 0 0 0 0 0 1 0 1 0 1 0 0 0 0 0 1 0 1 0 0 0 1 0 1 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 2 0 0 1 0 0 1 0 1 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "
     for pixel in arr:
         arrstr += str(pixel) + " "
 
     # End string in newline
-    arrstr = (arrstr[:-1] + '\n').encode('ascii', 'replace')
-
+    arrstr = (arrstr[:-1]).encode('ascii', 'replace')
+    arrstr1 = (arrstr1[:-1]).encode('ascii', 'replace')
+    
     # Send over serial
+    print(arrstr)
+    # print(arrstr1)
     with serial.Serial(port=serial_descriptor, baudrate=115200, bytesize=8, parity='N', stopbits=1, timeout=None,
                        xonxoff=0,
                        rtscts=0) as ser:
         ser.write(arrstr)
+    # Send a new line character to end the std::getline in C++
+    with serial.Serial(port=serial_descriptor, baudrate=115200, bytesize=8, parity='N', stopbits=1, timeout=None,
+                       xonxoff=0,
+                       rtscts=0) as ser:
+        ser.write(new_line.encode())
     return
+
+# Sends 8 bit grayscale image to FPGA
+def send_array_Haffmancoding(serial_descriptor, arrstr1):
+    new_line= "\n"
+    arrstr1 = (arrstr1[:-1]).encode('ascii', 'replace')
+    
+    # Send over serial
+    print(arrstr1)
+    with serial.Serial(port=serial_descriptor, baudrate=115200, bytesize=8, parity='N', stopbits=1, timeout=None,
+                       xonxoff=0,
+                       rtscts=0) as ser:
+        ser.write(arrstr1)
+    # Send a new line character to end the std::getline in C++
+    with serial.Serial(port=serial_descriptor, baudrate=115200, bytesize=8, parity='N', stopbits=1, timeout=None,
+                       xonxoff=0,
+                       rtscts=0) as ser:
+        ser.write(new_line.encode())
+    return
+
 
 #Decodes received string from FPGA as array
 def receive_array(serial_descriptor):
