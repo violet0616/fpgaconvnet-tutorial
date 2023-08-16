@@ -25,6 +25,27 @@ def get_MNIST_image(idx):
     arr = np.tile(arr, (42, 1, 1, 1))
     return arr
 
+def get_CIFAR_image(idx):
+    # Read the mnist binary format
+    image_path = "MNIST/t10k-images.idx3-ubyte"
+    with open(image_path, 'rb') as fh:
+        fh.seek(16 + idx * (28 * 28), 0)
+        arr = list(fh.read(28 * 28))
+    arr = np.array(arr)
+    arr = arr.astype('float32')
+
+    # Normalize array [-1, 1]
+    arr = np.subtract(arr, (np.amax(arr) + np.amin(arr)) / 2)
+    arr = np.multiply(arr, 1 / np.amax(arr))
+
+    # Resize to (32, 32)
+    arr = np.reshape(arr, (28, 28))
+    arr = np.pad(arr, ((2, 2), (2, 2)), mode='constant')
+
+    # Batches for onnx run
+    arr = np.reshape(arr, (1, 1, 32, 32))
+    arr = np.tile(arr, (42, 1, 1, 1))
+    return arr
 
 # Grabs corresponding label at index idx from the MNIST testing dataset
 def get_MNIST_label(idx):
@@ -37,6 +58,12 @@ def get_MNIST_label(idx):
 def run_inference(model_path, input):
     ort_sess = onnxruntime.InferenceSession(model_path)
     return ort_sess.run(["conv1"], {"conv1_input": input})
+
+
+def run_inference_unknown_name(ort_sess, input):
+    output_names = [output.name for output in ort_sess.get_outputs()]  # Get actual output names from the model
+    return ort_sess.run(None, {"conv1_input": input})
+
 
 # Sends 8 bit grayscale image to FPGA
 def send_array(serial_descriptor, arr):
