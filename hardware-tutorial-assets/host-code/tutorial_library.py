@@ -1,7 +1,30 @@
 import numpy as np
 import onnxruntime
 import serial
+import torchvision
+import torchvision.transforms as transforms
 
+
+
+def get_CIFAR10_image(idx):
+    # Define a transform to normalize the data
+    transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))  # Normalize to [-1, 1]
+    ])
+
+    # Download the CIFAR-10 dataset
+    trainset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
+
+    # Load a specific image from the dataset
+    image, label = trainset[idx]
+
+    # Convert the image tensor to a numpy array
+    arr = image.numpy()
+
+    # Batches for onnx run
+    arr = np.tile(arr, (42, 1, 1, 1))
+    return arr
 
 # Grabs image at index idx from the MNIST testing dataset
 def get_MNIST_image(idx):
@@ -25,7 +48,7 @@ def get_MNIST_image(idx):
     arr = np.tile(arr, (42, 1, 1, 1))
     return arr
 
-def get_CIFAR_image(idx):
+def get_CIFAR_image_fake(idx):
     # Read the mnist binary format
     image_path = "MNIST/t10k-images.idx3-ubyte"
     with open(image_path, 'rb') as fh:

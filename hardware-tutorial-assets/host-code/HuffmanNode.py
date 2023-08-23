@@ -1,10 +1,9 @@
 import numpy as np
 import tutorial_library
 from matplotlib import pyplot as plt
-import sys
 from collections import Counter
-from HuffmanNode import HuffmanNode
-import heapq
+import copy
+import sys
 
 class HuffmanNode:
     def __init__(self, symbol, frequency):
@@ -25,9 +24,10 @@ def analyze_data(data):
     Returns:
         dict: A dictionary containing the frequency of occurrence for each unique symbol.
     """
-    data = np.array(data)
+    data_copy = copy.deepcopy(data)
+    data_copy = np.array(data_copy)
     # Flatten the 2D data array to a 1D array
-    flattened_data = data.flatten()
+    flattened_data = data_copy.flatten()
 
     # Count the frequency of each unique symbol using the Counter class
     symbol_frequencies = Counter(flattened_data)
@@ -122,6 +122,7 @@ def counting_total_bits_after_comp(string_in):
         count_1 = string_in.count('1')   
         return count_0+count_1 
     
+    
 def print_out_codemap(code_map):
     print("{", end="")
     for key, value in code_map.items():
@@ -131,6 +132,14 @@ def print_out_codemap(code_map):
             print(", ", end="")
     print("}")
 
+def print_out_codemap_to_txt(code_map, file=sys.stdout):
+    print("{", end="", file=file)
+    for key, value in code_map.items():
+        print(f"{{0b{value}, {len(value)}, {key}}}", end="", file=file)
+        if key != list(code_map.keys())[-1]:
+            print(", ", end="", file=file)
+    print("}", file=file)
+    
 def print_out_padding_codemap(code_map, padded_bits):
     print("{", end="")
     for key, value in code_map.items():

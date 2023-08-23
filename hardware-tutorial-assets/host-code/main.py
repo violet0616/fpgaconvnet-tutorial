@@ -44,6 +44,8 @@ def main():
 
     
  
+ 
+ 
     # Haffman coding process for minist_image_data_set###################################################################################################
     mnist_image_list = []   
     freq_map = get_freq_map_for_MNIST_images(1, mnist_image_list)
